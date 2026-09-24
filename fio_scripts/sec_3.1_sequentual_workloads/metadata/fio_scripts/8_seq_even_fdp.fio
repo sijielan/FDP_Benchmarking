@@ -1,0 +1,85 @@
+[global]
+
+ioengine=io_uring_cmd
+
+cmd_type=nvme
+
+filename=/dev/ng1n1
+
+
+
+rw=write
+
+bs=128K
+
+iodepth=256
+
+fdp=1
+
+
+
+log_avg_msec=60000
+
+write_bw_log=./compare_fdp_seq_bw
+
+write_lat_log=./compare_fdp_seq_lat
+
+write_iops_log=./compare_fdp_seq_iops
+
+
+
+time_based=1
+
+runtime=8h
+
+# 8 jobs split the whole device evenly by LBA
+# Device: 937,684,566 LBAs x 4096 B = 3,840,755,982,336 bytes (3.84 TB)
+# 937,684,566 = 8 x 117,210,570 + 6: jobs 1-6 get 117,210,571 LBAs, jobs 7-8 get 117,210,570 LBAs
+
+[write-1]
+fdp_pli=0
+offset=0
+size=480094498816
+# lba_offset=0  lba_size=117,210,571  (457853.8 MB)
+
+[write-2]
+fdp_pli=1
+offset=480094498816
+size=480094498816
+# lba_offset=117,210,571  lba_size=117,210,571  (457853.8 MB)
+
+[write-3]
+fdp_pli=2
+offset=960188997632
+size=480094498816
+# lba_offset=234,421,142  lba_size=117,210,571  (457853.8 MB)
+
+[write-4]
+fdp_pli=3
+offset=1440283496448
+size=480094498816
+# lba_offset=351,631,713  lba_size=117,210,571  (457853.8 MB)
+
+[write-5]
+fdp_pli=4
+offset=1920377995264
+size=480094498816
+# lba_offset=468,842,284  lba_size=117,210,571  (457853.8 MB)
+
+[write-6]
+fdp_pli=5
+offset=2400472494080
+size=480094498816
+# lba_offset=586,052,855  lba_size=117,210,571  (457853.8 MB)
+
+[write-7]
+fdp_pli=6
+offset=2880566992896
+size=480094494720
+# lba_offset=703,263,426  lba_size=117,210,570  (457853.8 MB)
+
+[write-8]
+fdp_pli=7
+offset=3360661487616
+size=480094494720
+# lba_offset=820,473,996  lba_size=117,210,570  (457853.8 MB)

@@ -1,0 +1,44 @@
+# Stage 3/3 - hot random write, prefill 80% (Conv.): LBA [80%, 100%) = 20% of the device
+# io_size = 10x device capacity (38,407,559,823,360 bytes, ~38.4 TB); fio keeps rewriting the hot region until this much has been written
+# FDP: hot data -> dedicated RUH fdp_pli=1 (isolated from the cold RUH fdp_pli=0)
+# WAF for the figure is measured over this stage only
+
+[global]
+
+ioengine=io_uring_cmd
+
+cmd_type=nvme
+
+filename=/dev/ng0n2
+
+
+
+rw=randwrite
+
+bs=128K
+
+iodepth=256
+
+fdp=0
+
+
+
+log_avg_msec=60000
+
+write_bw_log=./prefill_hot_bw
+
+write_lat_log=./prefill_hot_lat
+
+write_iops_log=./prefill_hot_iops
+
+
+
+[hot-randwrite]
+
+#fdp_pli=1
+
+offset=80%
+
+size=20%
+
+io_size=38407559823360

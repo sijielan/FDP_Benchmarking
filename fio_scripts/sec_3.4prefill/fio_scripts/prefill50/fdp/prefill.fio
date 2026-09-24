@@ -1,0 +1,30 @@
+# Stage 2/3 - prefill 50% (FDP): cold data, sequential write LBA [0%, 50%) once
+# FDP: cold data -> fdp_pli=0
+
+[global]
+
+ioengine=io_uring_cmd
+
+cmd_type=nvme
+
+filename=/dev/ng1n1
+
+
+
+rw=write
+
+bs=128K
+
+iodepth=256
+
+fdp=1
+
+
+
+[prefill-cold]
+
+fdp_pli=0
+
+offset=0
+
+size=50%

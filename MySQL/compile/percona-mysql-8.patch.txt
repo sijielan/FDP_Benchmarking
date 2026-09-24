@@ -1,0 +1,77 @@
+diff -uprN percona-server-release-8.0.34-26/storage/innobase/buf/buf0dblwr.cc percona-server-release-8.0.34-26-fdp/storage/innobase/buf/buf0dblwr.cc
+--- percona-server-release-8.0.34-26/storage/innobase/buf/buf0dblwr.cc  2023-09-15 03:45:46.000000000 +0800
++++ percona-server-release-8.0.34-26-fdp/storage/innobase/buf/buf0dblwr.cc      2025-03-03 14:50:19.118378728 +0800
+@@ -2727,6 +2727,10 @@ static dberr_t dblwr_file_open(const std
+     return DB_IO_ERROR;
+   } else {
+     ib::info(ER_IB_MSG_DBLWR_1286, file.m_name.c_str());
++    if (file.m_pfs.m_file != OS_FILE_CLOSED) {
++      WriteLifeTimeHint file_hint = WLTH_SHORT;
++      fcntl(file.m_pfs.m_file, F_SET_RW_HINT, &file_hint);
++    }
+   }
+
+   return DB_SUCCESS;
+diff -uprN percona-server-release-8.0.34-26/storage/innobase/fil/fil0fil.cc percona-server-release-8.0.34-26-fdp/storage/innobase/fil/fil0fil.cc
+--- percona-server-release-8.0.34-26/storage/innobase/fil/fil0fil.cc    2023-09-15 03:45:46.000000000 +0800
++++ percona-server-release-8.0.34-26-fdp/storage/innobase/fil/fil0fil.cc        2025-03-03 14:54:57.746385745 +0800
+@@ -5628,7 +5628,8 @@ dberr_t fil_write_initial_pages(pfs_os_f
+ @return DB_SUCCESS or error code */
+ static dberr_t fil_create_tablespace(space_id_t space_id, const char *name,
+                                      const char *path, uint32_t flags,
+-                                     page_no_t size, fil_type_t type) {
++                                     page_no_t size, fil_type_t type,
++                                     WriteLifeTimeHint file_hint) {
+   ut_ad(!fsp_is_system_tablespace(space_id));
+   ut_a(fsp_flags_is_valid(flags));
+   ut_a(type == FIL_TYPE_TEMPORARY || type == FIL_TYPE_TABLESPACE);
+@@ -5681,6 +5682,10 @@ static dberr_t fil_create_tablespace(spa
+     /* purecov: end */
+   }
+
++  if (file.m_file != OS_FILE_CLOSED) {
++       fcntl(file.m_file, F_SET_RW_HINT, &file_hint);
++  }
++
+   bool atomic_write = false;
+   bool punch_hole = false;
+
+@@ -5773,15 +5778,17 @@ dberr_t fil_ibd_create(space_id_t space_
+                        uint32_t flags, page_no_t size) {
+   ut_a(size >= FIL_IBD_FILE_INITIAL_SIZE);
+   ut_ad(!srv_read_only_mode);
++  WriteLifeTimeHint f_hint = WLTH_LONG;
+   return fil_create_tablespace(space_id, name, path, flags, size,
+-                               FIL_TYPE_TABLESPACE);
++                               FIL_TYPE_TABLESPACE, f_hint);
+ }
+
+ dberr_t fil_ibt_create(space_id_t space_id, const char *name, const char *path,
+                        uint32_t flags, page_no_t size) {
+   ut_a(size >= FIL_IBT_FILE_INITIAL_SIZE);
++  WriteLifeTimeHint f_hint = WLTH_NOT_SET;
+   return fil_create_tablespace(space_id, name, path, flags, size,
+-                               FIL_TYPE_TEMPORARY);
++                               FIL_TYPE_TEMPORARY, f_hint);
+ }
+
+ #ifndef UNIV_HOTBACKUP
+diff -uprN percona-server-release-8.0.34-26/storage/innobase/include/fil0fil.h percona-server-release-8.0.34-26-fdp/storage/innobase/include/fil0fil.h
+--- percona-server-release-8.0.34-26/storage/innobase/include/fil0fil.h 2023-09-15 03:45:46.000000000 +0800
++++ percona-server-release-8.0.34-26-fdp/storage/innobase/include/fil0fil.h     2025-03-03 14:55:34.130386661 +0800
+@@ -53,6 +53,15 @@ this program; if not, write to the Free
+ #include <list>
+ #include <vector>
+
++typedef enum WriteLifeTimeHint {
++       WLTH_NOT_SET = 0,  // No hint information set
++       WLTH_NONE,         // No hints about write life time
++       WLTH_SHORT,        // Data written has a short life time
++       WLTH_MEDIUM,       // Data written has a medium life time
++       WLTH_LONG,         // Data written has a long life time
++       WLTH_EXTREME,      // Data written has an extremely long life time
++}WriteLifeTimeHint;
++
+ extern ulong srv_fast_shutdown;
+
+ /** Maximum number of tablespaces to be scanned by a thread while scanning
