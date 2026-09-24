@@ -1,0 +1,3 @@
+[submodule "RocksDB/TorFS"]
+	path = RocksDB/TorFS
+	url = https://github.com/SamsungDS/TorFS.git
