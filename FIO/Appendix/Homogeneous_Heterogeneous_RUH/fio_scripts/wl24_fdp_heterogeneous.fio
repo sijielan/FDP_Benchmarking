@@ -1,0 +1,213 @@
+[global]
+
+ioengine=io_uring_cmd
+cmd_type=nvme
+filename=/dev/ng1n1
+
+rw=write
+bs=128K
+iodepth=256
+fdp=1
+
+log_avg_msec=60000
+write_bw_log=./compare_fdp_seq_bw
+write_lat_log=./compare_fdp_seq_lat
+write_iops_log=./compare_fdp_seq_iops
+
+time_based=1
+runtime=4h
+
+# 总job数=24，每RUH 3个job
+# 策略：同一RUH内size差距最大化，job的offset/size与原始均分布局相同，仅fdp_pli重新分配
+
+########################################
+# 新RUH 0  ratio=11.5x
+# sizes: 24419MB 24419MB 280817MB
+########################################
+
+[write-0-1]
+fdp_pli=0
+offset=0
+size=25605038080
+# orig: RUH0-job1  (24418.9 MB)
+
+[write-0-2]
+fdp_pli=0
+offset=25605038080
+size=25605038080
+# orig: RUH0-job2  (24418.9 MB)
+
+[write-0-3]
+fdp_pli=0
+offset=2957382098944
+size=294457958400
+# orig: RUH7-job1  (280817.0 MB)
+
+
+########################################
+# 新RUH 1  ratio=11.5x
+# sizes: 24419MB 280817MB 280817MB
+########################################
+
+[write-1-1]
+fdp_pli=1
+offset=51210076160
+size=25605042176
+# orig: RUH0-job3  (24418.9 MB)
+
+[write-1-2]
+fdp_pli=1
+offset=3251840057344
+size=294457958400
+# orig: RUH7-job2  (280817.0 MB)
+
+[write-1-3]
+fdp_pli=1
+offset=3546298015744
+size=294457966592
+# orig: RUH7-job3  (280817.0 MB)
+
+
+########################################
+# 新RUH 2  ratio=4.0x
+# sizes: 61047MB 61047MB 244189MB
+########################################
+
+[write-2-1]
+fdp_pli=2
+offset=76815118336
+size=64012599296
+# orig: RUH1-job1  (61047.2 MB)
+
+[write-2-2]
+fdp_pli=2
+offset=140827717632
+size=64012599296
+# orig: RUH1-job2  (61047.2 MB)
+
+[write-2-3]
+fdp_pli=2
+offset=2189230903296
+size=256050397184
+# orig: RUH6-job1  (244188.7 MB)
+
+
+########################################
+# 新RUH 3  ratio=4.0x
+# sizes: 61047MB 244189MB 244189MB
+########################################
+
+[write-3-1]
+fdp_pli=3
+offset=204840316928
+size=64012599296
+# orig: RUH1-job3  (61047.2 MB)
+
+[write-3-2]
+fdp_pli=3
+offset=2445281300480
+size=256050397184
+# orig: RUH6-job2  (244188.7 MB)
+
+[write-3-3]
+fdp_pli=3
+offset=2701331697664
+size=256050401280
+# orig: RUH6-job3  (244188.7 MB)
+
+
+########################################
+# 新RUH 4  ratio=2.1x
+# sizes: 97675MB 97675MB 207560MB
+########################################
+
+[write-4-1]
+fdp_pli=4
+offset=268852916224
+size=102420156416
+# orig: RUH2-job1  (97675.5 MB)
+
+[write-4-2]
+fdp_pli=4
+offset=371273072640
+size=102420156416
+# orig: RUH2-job2  (97675.5 MB)
+
+[write-4-3]
+fdp_pli=4
+offset=1536302387200
+size=217642835968
+# orig: RUH5-job1  (207560.4 MB)
+
+
+########################################
+# 新RUH 5  ratio=2.1x
+# sizes: 97675MB 207560MB 207560MB
+########################################
+
+[write-5-1]
+fdp_pli=5
+offset=473693229056
+size=102420164608
+# orig: RUH2-job3  (97675.5 MB)
+
+[write-5-2]
+fdp_pli=5
+offset=1753945223168
+size=217642835968
+# orig: RUH5-job2  (207560.4 MB)
+
+[write-5-3]
+fdp_pli=5
+offset=1971588059136
+size=217642844160
+# orig: RUH5-job3  (207560.4 MB)
+
+
+########################################
+# 新RUH 6  ratio=1.3x
+# sizes: 134304MB 134304MB 170932MB
+########################################
+
+[write-6-1]
+fdp_pli=6
+offset=576113393664
+size=140827717632
+# orig: RUH3-job1  (134303.8 MB)
+
+[write-6-2]
+fdp_pli=6
+offset=716941111296
+size=140827717632
+# orig: RUH3-job2  (134303.8 MB)
+
+[write-6-3]
+fdp_pli=6
+offset=998596550656
+size=179235278848
+# orig: RUH4-job1  (170932.1 MB)
+
+
+########################################
+# 新RUH 7  ratio=1.3x
+# sizes: 134304MB 170932MB 170932MB
+########################################
+
+[write-7-1]
+fdp_pli=7
+offset=857768828928
+size=140827721728
+# orig: RUH3-job3  (134303.8 MB)
+
+[write-7-2]
+fdp_pli=7
+offset=1177831829504
+size=179235278848
+# orig: RUH4-job2  (170932.1 MB)
+
+[write-7-3]
+fdp_pli=7
+offset=1357067108352
+size=179235278848
+# orig: RUH4-job3  (170932.1 MB)
+
