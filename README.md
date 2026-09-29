@@ -1,4 +1,4 @@
-# FDP VLDB Artifact
+# FDP Benchmarking Artifact
 
 Scripts, patches and build instructions for the experiments on NVMe Flexible Data Placement (FDP) SSDs.
 
