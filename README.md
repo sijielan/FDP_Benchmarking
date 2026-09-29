@@ -28,5 +28,3 @@ git clone --recurse-submodules <this-repo-url>
 1. Build and boot the patched kernel: [`kernel_compile/README.md`](kernel_compile/README.md)
 2. Run the fio microbenchmarks in [`fio_scripts/`](fio_scripts)
 3. Build RocksDB / MySQL and run the application experiments: see the README in each folder
-
-**Warning:** the scripts write to raw NVMe devices and may format them or recreate namespaces. Only run them on a dedicated test drive.
