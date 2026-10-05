@@ -1,5 +1,7 @@
 # FDP Benchmarking Artifact
 
+> **Full paper (with appendix):** *FDP: The Data Placement Promise of Modern NVMe SSDs* is available on [arXiv:2610.02676](https://arxiv.org/abs/2610.02676) and as a local copy in this repo: [`extend_paper FDP The Data Placement Promise of Modern NVMe SSDs.pdf`](<extend_paper FDP The Data Placement Promise of Modern NVMe SSDs.pdf>). This version of the paper includes all appendix experiments.
+
 Scripts, patches and build instructions for the experiments on NVMe Flexible Data Placement (FDP) SSDs.
 
 Clone with the TorFS submodule:
